@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automação para Contabilidades — Reduza o retrabalho e erro humano</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0D0D0D;
+    --ink-soft: #444;
+    --ink-mute: #888;
+    --paper: #F5F2EC;
+    --white: #FFFFFF;
+    --accent: #1A5CFF;
+    --accent-dark: #0038CC;
+    --green: #00C67A;
+    --border: rgba(13,13,13,0.1);
+    --shadow: 0 2px 24px rgba(13,13,13,0.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 5vw;
+    background: rgba(245,242,236,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.01em; }
+  .nav-logo span { color: var(--accent); }
+  .nav-cta {
+    background: var(--ink); color: var(--white);
+    padding: .5rem 1.25rem; border-radius: 100px;
+    text-decoration: none; font-size: .875rem; font-weight: 500;
+    transition: background .2s;
+  }
+  .nav-cta:hover { background: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 8rem 5vw 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 100px; padding: .35rem 1rem;
+    font-size: .8rem; font-weight: 500; color: var(--ink-soft);
+    margin-bottom: 1.5rem;
+  }
+  .hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900; line-height: 1.0;
+    letter-spacing: 0.01em;
+    margin-bottom: 1.5rem;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    font-size: 1.1rem; color: var(--ink-soft); line-height: 1.7;
+    margin-bottom: 2.5rem; max-width: 480px;
+  }
+  .hero-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: .6rem;
+    background: #25D366; color: var(--white);
+    padding: .85rem 1.75rem; border-radius: 100px;
+    text-decoration: none; font-weight: 600; font-size: 1rem;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,211,102,0.45); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: var(--ink-soft); font-size: .9rem; text-decoration: none;
+    border-bottom: 1px solid var(--border); padding-bottom: 2px;
+    transition: color .2s, border-color .2s;
+  }
+  .btn-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* HERO VISUAL */
+  .hero-visual {
+    position: relative; display: flex; justify-content: center; align-items: center;
+  }
+  .visual-card {
+    background: var(--white); border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 1.5rem; width: 100%; max-width: 380px;
+    box-shadow: var(--shadow);
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .visual-card-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
+  .visual-avatar { width: 40px; height: 40px; border-radius: 50%; background: #E8F0FF; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+  .visual-name { font-weight: 600; font-size: .95rem; }
+  .visual-status { font-size: .75rem; color: var(--ink-mute); }
+  .visual-msg {
+    background: var(--paper); border-radius: 12px 12px 12px 4px;
+    padding: .75rem 1rem; font-size: .85rem; color: var(--ink-soft);
+    margin-bottom: .75rem; line-height: 1.5;
+  }
+  .visual-action {
+    background: var(--accent); color: var(--white);
+    border-radius: 10px; padding: .6rem 1rem;
+    font-size: .8rem; font-weight: 500; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+  }
+  .visual-badge {
+    position: absolute; bottom: -20px; right: -10px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 12px; padding: .6rem 1rem;
+    display: flex; align-items: center; gap: .5rem;
+    font-size: .8rem; font-weight: 500;
+    box-shadow: var(--shadow);
+    animation: float 4s ease-in-out infinite .5s;
+  }
+  .badge-icon { font-size: 1.1rem; }
+
+  /* STATS */
+  .stats {
+    background: var(--ink); color: var(--white);
+    padding: 4rem 5vw;
+  }
+  .stats-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 3.5rem; font-weight: 900; letter-spacing: 0.01em; }
+  .stat-num span { color: var(--accent); }
+  .stat-label { font-size: .9rem; color: rgba(255,255,255,0.55); margin-top: .25rem; }
+
+  /* SECTION */
+  section { padding: 6rem 5vw; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-tag {
+    font-size: .75rem; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 1rem; display: block;
+  }
+  h2 {
+    font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 800; letter-spacing: 0.01em; line-height: 1.05;
+    margin-bottom: 1.25rem;
+  }
+  .section-sub { font-size: 1.05rem; color: var(--ink-soft); max-width: 560px; line-height: 1.7; }
+
+  /* DOR */
+  .dor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .dor-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.75rem;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .dor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  .dor-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .dor-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.15rem; margin-bottom: .5rem; letter-spacing: 0.01em; }
+  .dor-text { font-size: .9rem; color: var(--ink-soft); line-height: 1.65; }
+
+  /* SERVIÇOS */
+  .servicos-bg { background: var(--white); }
+  .servicos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .servico-card {
+    border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+    position: relative; overflow: hidden;
+    transition: border-color .2s;
+  }
+  .servico-card:hover { border-color: var(--accent); }
+  .servico-card.destaque { border: 2px solid var(--accent); }
+  .servico-badge {
+    position: absolute; top: 1.25rem; right: 1.25rem;
+    background: var(--accent); color: var(--white);
+    font-size: .7rem; font-weight: 600; padding: .25rem .75rem;
+    border-radius: 100px; letter-spacing: .05em;
+  }
+  .servico-numero { font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; font-weight: 900; color: rgba(13,13,13,0.08); margin-bottom: .5rem; }
+  .servico-titulo { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: .35rem; letter-spacing: 0.01em; }
+  .servico-preco { font-size: .85rem; font-weight: 600; color: var(--accent); margin-bottom: 1rem; }
+  .servico-desc { font-size: .9rem; color: var(--ink-soft); line-height: 1.65; margin-bottom: 1.25rem; }
+  .servico-itens { list-style: none; }
+  .servico-itens li {
+    font-size: .875rem; color: var(--ink-soft);
+    padding: .4rem 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .servico-itens li:last-child { border-bottom: none; }
+  .check { color: var(--green); font-weight: 700; }
+
+  /* COMO FUNCIONA */
+  .como-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 3rem; }
+  .etapas { display: flex; flex-direction: column; gap: 0; }
+  .etapa {
+    display: flex; gap: 1.25rem; padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .etapa:last-child { border-bottom: none; }
+  .etapa-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--paper); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: .9rem;
+    flex-shrink: 0; transition: background .2s, color .2s;
+  }
+  .etapa.ativa .etapa-num { background: var(--accent); color: var(--white); border-color: var(--accent); }
+  .etapa-titulo { font-weight: 600; font-size: 1rem; margin-bottom: .25rem; }
+  .etapa-desc { font-size: .875rem; color: var(--ink-soft); line-height: 1.6; }
+  .como-visual {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 20px; padding: 2rem; min-height: 300px;
+    display: flex; flex-direction: column; justify-content: center;
+    box-shadow: var(--shadow);
+  }
+  .visual-linha { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+  .visual-dot-outer { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+  .visual-linha-txt { font-size: .9rem; }
+  .visual-linha-txt strong { display: block; font-weight: 600; }
+  .visual-linha-txt span { color: var(--ink-mute); font-size: .8rem; }
+
+  /* CASE */
+  .case-bg { background: var(--ink); color: var(--white); }
+  .case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .case-tag { color: rgba(255,255,255,.5); }
+  .case-bg h2 { color: var(--white); }
+  .case-texto { font-size: 1rem; color: rgba(255,255,255,.7); line-height: 1.75; margin-bottom: 1.5rem; }
+  .case-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+  .case-num-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 1.25rem; }
+  .case-num { font-family: 'Barlow Condensed', sans-serif; font-size: 2.25rem; font-weight: 900; color: var(--accent); letter-spacing: 0.01em; }
+  .case-num-label { font-size: .8rem; color: rgba(255,255,255,.5); margin-top: .25rem; }
+  .case-visual-side { position: relative; }
+  .case-card {
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px; padding: 1.5rem;
+  }
+  .case-card-title { font-weight: 600; margin-bottom: 1rem; font-size: .95rem; }
+  .caso-linha {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .6rem 0; border-bottom: 1px solid rgba(255,255,255,.07);
+    font-size: .85rem;
+  }
+  .caso-linha:last-child { border-bottom: none; }
+  .caso-antes { color: rgba(255,255,255,.4); text-decoration: line-through; }
+  .caso-depois { color: var(--green); font-weight: 500; }
+
+  /* FAQ */
+  .faq-list { max-width: 760px; margin-top: 3rem; }
+  .faq-item { border-bottom: 1px solid var(--border); }
+  .faq-q {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.25rem 0; cursor: pointer; font-weight: 500; font-size: 1rem;
+    user-select: none;
+  }
+  .faq-q span { transition: transform .3s; font-size: 1.2rem; }
+  .faq-item.open .faq-q span { transform: rotate(45deg); }
+  .faq-a { font-size: .9rem; color: var(--ink-soft); line-height: 1.7; overflow: hidden; max-height: 0; transition: max-height .3s, padding .3s; }
+  .faq-item.open .faq-a { max-height: 200px; padding-bottom: 1.25rem; }
+
+  /* CTA FINAL */
+  .cta-final {
+    background: var(--accent); color: var(--white);
+    text-align: center; padding: 6rem 5vw;
+  }
+  .cta-final h2 { color: var(--white); margin-bottom: 1rem; }
+  .cta-final p { font-size: 1.1rem; color: rgba(255,255,255,.8); margin-bottom: 2.5rem; max-width: 520px; margin-left: auto; margin-right: auto; }
+  .btn-wpp-grande {
+    display: inline-flex; align-items: center; gap: .75rem;
+    background: var(--white); color: var(--accent);
+    padding: 1rem 2rem; border-radius: 100px;
+    text-decoration: none; font-weight: 700; font-size: 1.05rem;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+  }
+  .btn-wpp-grande:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink); color: rgba(255,255,255,.4);
+    padding: 2rem 5vw; text-align: center; font-size: .8rem;
+  }
+
+  /* WHATSAPP FIXO */
+  .wpp-fixo {
+    position: fixed; bottom: 1.75rem; right: 1.75rem; z-index: 999;
+    background: #25D366; color: var(--white);
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; box-shadow: 0 4px 20px rgba(37,211,102,.5);
+    text-decoration: none;
+    transition: transform .2s;
+    animation: wppPulse 2.5s infinite;
+  }
+  @keyframes wppPulse {
+    0%,100%{box-shadow:0 4px 20px rgba(37,211,102,.5)}
+    50%{box-shadow:0 4px 40px rgba(37,211,102,.8)}
+  }
+  .wpp-fixo:hover { transform: scale(1.1); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero-grid, .como-grid, .case-grid { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .case-numeros { grid-template-columns: 1fr 1fr; }
+    h1 { font-size: 2.5rem; }
+  }
+
+  /* ANIMAÇÕES DE ENTRADA */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s, transform .6s; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Auto<span>Contábil</span></div>
+  <a href="https://wa.me/5500000000000?text=Olá!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20automação%20para%20contabilidade." class="nav-cta" target="_blank">Falar no WhatsApp</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag">
+        <span class="hero-tag-dot"></span>
+        Especialista em automação contábil
+      </div>
+      <h1>Sua equipe parou de <em>perder tempo</em> no WhatsApp?</h1>
+      <p class="hero-sub">
+        Automatizo o fluxo operacional do seu escritório de contabilidade — do WhatsApp ao Gestta e Onvio — eliminando retrabalho, erros de lançamento e tarefas manuais repetitivas.
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/5500000000000?text=Olá!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20automação%20para%20minha%20contabilidade." class="btn-primary" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.122 1.532 5.856L.054 23.543a.5.5 0 0 0 .612.612l5.687-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.98 0-3.83-.563-5.4-1.536l-.388-.232-4.017 1.044 1.072-3.91-.254-.403A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Quero uma análise gratuita
+        </a>
+        <a href="#servicos" class="btn-secondary">Ver serviços →</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-card">
+        <div class="visual-card-header">
+          <div class="visual-avatar">🤖</div>
+          <div>
+            <div class="visual-name">Automação ativa</div>
+            <div class="visual-status">● processando mensagens</div>
+          </div>
+        </div>
+        <div class="visual-msg">
+          📩 "Preciso do balancete da Empresa ABC para esta semana"
+        </div>
+        <div class="visual-action">
+          ✓ Tarefa criada no Gestta — Empresa ABC — Prioridade alta
+        </div>
+      </div>
+      <div class="visual-badge">
+        <span class="badge-icon">⚡</span>
+        <span>0% de erro de identificação</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat-item reveal">
+      <div class="stat-num">2<span>h</span></div>
+      <div class="stat-label">economizadas por dia em média nos escritórios atendidos</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">54<span>%</span></div>
+      <div class="stat-label">de redução de erros de lançamento de tarefas</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">5<span>d</span></div>
+      <div class="stat-label">para entregar a primeira automação funcionando</div>
+    </div>
+  </div>
+</div>
+
+<!-- DOR -->
+<section id="problemas">
+  <div class="section-inner">
+    <span class="section-tag reveal">O problema</span>
+    <h2 class="reveal">Seu escritório ainda faz isso no manual?</h2>
+    <p class="section-sub reveal">Esses são os gargalos mais comuns que encontro em contabilidades. Se você se identificar com qualquer um deles, há dinheiro sendo desperdiçado toda semana.</p>
+    <div class="dor-grid">
+      <div class="dor-card reveal">
+        <div class="dor-icon">💬</div>
+        <div class="dor-title">Triagem manual de WhatsApp</div>
+        <div class="dor-text">Colaboradores passam horas lendo mensagens, identificando o cliente e lançando tarefas manualmente no sistema — processo lento e sujeito a erros.</div>
+      </div>
+      <div class="dor-card reveal">
+        <div class="dor-icon">❌</div>
+        <div class="dor-title">Tarefas no cliente errado</div>
+        <div class="dor-text">Sem identificação automática, é comum lançar uma tarefa para a empresa errada. O retrabalho de corrigir custa tempo e gera estresse desnecessário.</div>
+      </div>
+      <div class="dor-card reveal">
+        <div class="dor-icon">📊</div>
+        <div class="dor-title">Base de clientes desorganizada</div>
+        <div class="dor-text">Dados de clientes espalhados, CNPJs sem vínculo com grupos de WhatsApp, integrações que não funcionam porque a base está bagunçada.</div>
+      </div>
+      <div class="dor-card reveal">
+        <div class="dor-icon">🔁</div>
+        <div class="dor-title">Processos que poderiam ser automáticos</div>
+        <div class="dor-text">Lembretes, relatórios de pendências, atualizações de status — tudo feito à mão toda semana, repetidamente, por pessoas que poderiam fazer coisas mais importantes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section id="servicos" class="servicos-bg">
+  <div class="section-inner">
+    <span class="section-tag reveal">Serviços</span>
+    <h2 class="reveal">Escolha o ponto de entrada certo para o seu escritório</h2>
+    <p class="section-sub reveal">Todos os projetos têm escopo fechado, prazo definido e entregável claro. Nada de surpresas.</p>
+    <div class="servicos-grid">
+      <div class="servico-card reveal">
+        <div class="servico-numero">01</div>
+        <div class="servico-titulo">Raio-X da Operação</div>
+        <div class="servico-preco">R$ 1.200 · 5 dias</div>
+        <div class="servico-desc">Diagnóstico completo da sua operação. Você recebe um relatório com os principais gargalos, horas perdidas por semana e recomendações práticas.</div>
+        <ul class="servico-itens">
+          <li><span class="check">✓</span> Mapeamento de grupos x clientes x ERP</li>
+          <li><span class="check">✓</span> Relatório com 5 maiores gargalos</li>
+          <li><span class="check">✓</span> Estimativa de horas perdidas/semana</li>
+          <li><span class="check">✓</span> Recomendação do próximo passo</li>
+        </ul>
+      </div>
+      <div class="servico-card destaque reveal">
+        <div class="servico-badge">Mais popular</div>
+        <div class="servico-numero">02</div>
+        <div class="servico-titulo">Automação Pontual</div>
+        <div class="servico-preco">R$ 2.200 · 7–10 dias</div>
+        <div class="servico-desc">Resolvo um processo manual do início ao fim: triagem de WhatsApp, organização de base de dados ou relatórios automáticos de pendências.</div>
+        <ul class="servico-itens">
+          <li><span class="check">✓</span> Um processo automatizado completamente</li>
+          <li><span class="check">✓</span> Integração com Gestta ou Onvio</li>
+          <li><span class="check">✓</span> Testes antes de ir ao ar (dry-run)</li>
+          <li><span class="check">✓</span> 15 dias de suporte pós-entrega</li>
+        </ul>
+      </div>
+      <div class="servico-card reveal">
+        <div class="servico-numero">03</div>
+        <div class="servico-titulo">Pacote Completo</div>
+        <div class="servico-preco">A partir de R$ 3.500 · 3–4 semanas</div>
+        <div class="servico-desc">Automação completa do fluxo operacional: WhatsApp → identificação → ERP → notificações. Com saneamento de base de dados incluso.</div>
+        <ul class="servico-itens">
+          <li><span class="check">✓</span> Diagnóstico + saneamento de dados</li>
+          <li><span class="check">✓</span> Automação de ponta a ponta</li>
+          <li><span class="check">✓</span> Dashboard de acompanhamento</li>
+          <li><span class="check">✓</span> 30 dias de suporte + treinamento</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como">
+  <div class="section-inner">
+    <span class="section-tag reveal">Como funciona</span>
+    <h2 class="reveal">Do primeiro contato à automação rodando</h2>
+    <div class="como-grid">
+      <div class="etapas reveal" id="etapas">
+        <div class="etapa ativa" onclick="ativarEtapa(0)">
+          <div class="etapa-num">1</div>
+          <div>
+            <div class="etapa-titulo">Conversa de diagnóstico</div>
+            <div class="etapa-desc">30 minutos para entender como seu escritório funciona hoje e onde estão os maiores gargalos. Sem compromisso.</div>
+          </div>
+        </div>
+        <div class="etapa" onclick="ativarEtapa(1)">
+          <div class="etapa-num">2</div>
+          <div>
+            <div class="etapa-titulo">Proposta com escopo fechado</div>
+            <div class="etapa-desc">Em 24 horas você recebe uma proposta clara: o que será feito, o que não está incluído, o prazo e o valor. Sem surpresas.</div>
+          </div>
+        </div>
+        <div class="etapa" onclick="ativarEtapa(2)">
+          <div class="etapa-num">3</div>
+          <div>
+            <div class="etapa-titulo">Desenvolvimento e testes</div>
+            <div class="etapa-desc">Desenvolvo a automação com testes antes de qualquer mudança no ambiente de produção. Você aprova antes de ir ao ar.</div>
+          </div>
+        </div>
+        <div class="etapa" onclick="ativarEtapa(3)">
+          <div class="etapa-num">4</div>
+          <div>
+            <div class="etapa-titulo">Entrega e suporte</div>
+            <div class="etapa-desc">A automação vai ao ar com acompanhamento. Você e a equipe recebem orientação de uso. Suporte incluso por 15–30 dias.</div>
+          </div>
+        </div>
+      </div>
+      <div class="como-visual reveal" id="como-visual">
+        <div class="visual-linha">
+          <div class="visual-dot-outer" style="background:#E8F0FF;">💬</div>
+          <div class="visual-linha-txt"><strong>Diagnóstico gratuito</strong><span>Entendemos sua operação</span></div>
+        </div>
+        <div class="visual-linha">
+          <div class="visual-dot-outer" style="background:#E8FFE8;">📄</div>
+          <div class="visual-linha-txt"><strong>Proposta em 24h</strong><span>Escopo e valor fechados</span></div>
+        </div>
+        <div class="visual-linha">
+          <div class="visual-dot-outer" style="background:#FFF8E1;">⚙️</div>
+          <div class="visual-linha-txt"><strong>Desenvolvimento seguro</strong><span>Teste antes do ar</span></div>
+        </div>
+        <div class="visual-linha" style="margin-bottom:0;">
+          <div class="visual-dot-outer" style="background:#E8FFE8;">✅</div>
+          <div class="visual-linha-txt"><strong>Entrega + suporte</strong><span>Automação rodando</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE -->
+<section class="case-bg">
+  <div class="section-inner">
+    <div class="case-grid">
+      <div class="reveal">
+        <span class="section-tag case-tag">Case real</span>
+        <h2>O que acontece quando a operação é automatizada</h2>
+        <p class="case-texto">Em um escritório de contabilidade com dezenas de clientes ativos, a equipe perdia mais de 2 horas diárias triando mensagens no WhatsApp e lançando tarefas manualmente — com taxa de erro de 54% nas atribuições.</p>
+        <p class="case-texto">Após o mapeamento da base, saneamento dos dados e implementação da automação de identificação automática por CNPJ e grupo, o cenário mudou completamente.</p>
+        <div class="case-numeros">
+          <div class="case-num-card">
+            <div class="case-num">~0%</div>
+            <div class="case-num-label">erro de identificação de cliente</div>
+          </div>
+          <div class="case-num-card">
+            <div class="case-num">2h+</div>
+            <div class="case-num-label">economizadas por dia pela equipe</div>
+          </div>
+          <div class="case-num-card">
+            <div class="case-num">5d</div>
+            <div class="case-num-label">do início à entrega em produção</div>
+          </div>
+          <div class="case-num-card">
+            <div class="case-num">R$0</div>
+            <div class="case-num-label">de custo extra após a entrega</div>
+          </div>
+        </div>
+      </div>
+      <div class="case-visual-side reveal">
+        <div class="case-card">
+          <div class="case-card-title">Antes → Depois</div>
+          <div class="caso-linha">
+            <span>Identificação de cliente</span>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <span class="caso-antes">Manual</span>
+              <span class="caso-depois">Automático</span>
+            </div>
+          </div>
+          <div class="caso-linha">
+            <span>Taxa de erro</span>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <span class="caso-antes">54%</span>
+              <span class="caso-depois">~0%</span>
+            </div>
+          </div>
+          <div class="caso-linha">
+            <span>Tempo de triagem/dia</span>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <span class="caso-antes">2h+</span>
+              <span class="caso-depois">&lt; 5min</span>
+            </div>
+          </div>
+          <div class="caso-linha">
+            <span>Criação de tarefas</span>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <span class="caso-antes">Manual</span>
+              <span class="caso-depois">Automático</span>
+            </div>
+          </div>
+          <div class="caso-linha">
+            <span>Integração com ERP</span>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <span class="caso-antes">Nenhuma</span>
+              <span class="caso-depois">Gestta ativo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-inner">
+    <span class="section-tag reveal">Dúvidas frequentes</span>
+    <h2 class="reveal">Perguntas que todo contador faz</h2>
+    <div class="faq-list reveal" id="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Preciso saber de tecnologia para usar a automação?
+          <span>+</span>
+        </div>
+        <div class="faq-a">Não. A automação funciona em segundo plano. Sua equipe continua usando WhatsApp normalmente — o sistema identifica o cliente e cria a tarefa automaticamente, sem que ninguém precise fazer nada diferente.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          E se a automação errar alguma coisa?
+          <span>+</span>
+        </div>
+        <div class="faq-a">Antes de ir ao ar, todos os projetos passam por uma fase de testes (dry-run) onde validamos cada cenário possível. Além disso, o suporte pós-entrega existe exatamente para corrigir qualquer comportamento inesperado nos primeiros dias de uso real.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Funciona com Gestta e Onvio?
+          <span>+</span>
+        </div>
+        <div class="faq-a">Sim. As integrações com Gestta e Onvio são as principais que atendo. Se o seu escritório usa outro sistema, faço uma análise de viabilidade antes de fechar qualquer proposta.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Quanto tempo leva para ver resultado?
+          <span>+</span>
+        </div>
+        <div class="faq-a">O pacote Raio-X é entregue em 5 dias. A Automação Pontual em 7–10 dias. O Pacote Completo em 3–4 semanas. Em todos os casos, o resultado é visível já na primeira semana de uso em produção.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Como é feito o pagamento?
+          <span>+</span>
+        </div>
+        <div class="faq-a">50% na assinatura do contrato e 50% na entrega. Via PIX ou transferência. O desenvolvimento começa após a confirmação do primeiro pagamento.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<div class="cta-final">
+  <h2 class="reveal">Pronto para parar de perder tempo com processos manuais?</h2>
+  <p class="reveal">Conversa de 30 minutos, sem compromisso. Você sai sabendo exatamente onde seu escritório está perdendo tempo e dinheiro.</p>
+  <a href="https://wa.me/5500000000000?text=Olá!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20análise%20gratuita%20da%20minha%20contabilidade." class="btn-wpp-grande reveal" target="_blank">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.122 1.532 5.856L.054 23.543a.5.5 0 0 0 .612.612l5.687-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.98 0-3.83-.563-5.4-1.536l-.388-.232-4.017 1.044 1.072-3.91-.254-.403A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Agendar análise gratuita no WhatsApp
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 AutoContábil · Automação para escritórios de contabilidade · Feito com tecnologia de ponta</p>
+</footer>
+
+<!-- WHATSAPP FIXO -->
+<a href="https://wa.me/5500000000000?text=Olá!%20Tenho%20interesse%20em%20automação%20para%20minha%20contabilidade." class="wpp-fixo" target="_blank" title="Falar no WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.122 1.532 5.856L.054 23.543a.5.5 0 0 0 .612.612l5.687-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.98 0-3.83-.563-5.4-1.536l-.388-.232-4.017 1.044 1.072-3.91-.254-.403A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+</a>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  function ativarEtapa(idx) {
+    document.querySelectorAll('.etapa').forEach((e, i) => {
+      e.classList.toggle('ativa', i === idx);
+    });
+  }
+</script>
+</body>
+</html>
